@@ -11,9 +11,9 @@ def introspection_info(obj):
         info['attributes'] = list(obj.__dict__.keys())
     else:
         info['attributes'] = []
-
+    
     info['methods'] = [method for method in dir(obj) if callable(getattr(obj, method))]
-
+    
     module = getattr(obj, '__module__', '__main__')
     info['module'] = module
 
@@ -35,7 +35,12 @@ class ExampleClass:
         return f"ExampleClass(value={self.value})"
 
 
-example_instance = ExampleClass(42)
+example_number = 42
+number_info = introspection_info(example_number)
+print("Интроспекция для числа 42:")
+print(number_info)
 
+example_instance = ExampleClass(42)
 info = introspection_info(example_instance)
+print("\nИнтроспекция для объекта ExampleClass:")
 print(info)
