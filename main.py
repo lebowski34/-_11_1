@@ -1,46 +1,56 @@
-import inspect
-import sys
-
-
 def introspection_info(obj):
     info = {}
 
-    info['type'] = str(type(obj).__name__)
+    info['type'] = type(obj).__name__
 
-    if hasattr(obj, '__dict__'):
-        info['attributes'] = list(obj.__dict__.keys())
-    else:
-        info['attributes'] = []
-    
-    info['methods'] = [method for method in dir(obj) if callable(getattr(obj, method))]
-    
-    module = getattr(obj, '__module__', '__main__')
-    info['module'] = module
+    info['module'] = type(obj).__module__
 
-    info['is_callable'] = callable(obj)
-    info['has_doc'] = bool(getattr(obj, '__doc__', None))
+    attributes = [attr for attr in dir(obj) if not callable(getattr(obj, attr)) and not attr.startswith("__")]
+    info['attributes'] = attributes
+
+    methods = [method for method in dir(obj) if callable(getattr(obj, method)) and not method.startswith("__")]
+    info['methods'] = methods
+
+    if isinstance(obj, (int, float, str, list, dict, set, tuple)):
+        info['value'] = obj
+    elif hasattr(obj, '__dict__'):
+        info['attributes_count'] = len(attributes)
+        info['methods_count'] = len(methods)
 
     return info
 
 
-class ExampleClass:
+class MyClass:
+    class_attribute = "Классовый атрибут"
 
-    def __init__(self, value):
+    def __init__(self, name, value):
+        self.name = name
         self.value = value
 
-    def example_method(self):
-        return f"Value is {self.value}"
+    def greet(self):
+        return f"Привет, {self.name}!"
 
-    def __str__(self):
-        return f"ExampleClass(value={self.value})"
+    def set_value(self, new_value):
+        self.value = new_value
 
 
-example_number = 42
-number_info = introspection_info(example_number)
-print("Интроспекция для числа 42:")
-print(number_info)
+# Пример использования функции introspection_info
 
-example_instance = ExampleClass(42)
-info = introspection_info(example_instance)
-print("\nИнтроспекция для объекта ExampleClass:")
-print(info)
+if __name__ == "__main__":
+    # Пример 1: Интроспекция целого числа
+    number_info = introspection_info(42)
+    print("Информация о числе 42:")
+    print(number_info)
+    print()
+
+    # Пример 2: Интроспекция строки
+    string_info = introspection_info("Hello, World!")
+    print("Информация о строке 'Hello, World!':")
+    print(string_info)
+    print()
+
+    # Пример 3: Интроспекция пользовательского объекта
+    my_obj = MyClass(name="Алиса", value=100)
+    object_info = introspection_info(my_obj)
+    print("Информация о пользовательском объекте MyClass:")
+    print(object_info)
